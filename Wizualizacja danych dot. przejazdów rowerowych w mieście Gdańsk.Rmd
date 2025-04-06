@@ -1,0 +1,214 @@
+---
+title: "Ruch rowerowy w Gdańsku"
+author: "Jakub Durawa, Patryk Fierek"
+date: "2025-04-06"
+output:
+  html_document:
+    code_folding: hide
+    theme: united  # Themes: default, cerulean, journal, flatly, readable
+    highlight: tango
+    toc: true      # Table of contents
+    toc_float: true  # Makes TOC float for easy navigation
+    number_sections: true  # Auto-number headings
+    df_print: kable  # Beautify tables
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Wstęp
+
+---
+ **Biblioteki wykorzystane do analizy**
+Do realizacji analizy wykorzystano następujące biblioteki w R:
+- **ggplot2**
+- **dplyr**
+- **lubridate**
+
+
+```{r, echo=FALSE, message= FALSE, warning= FALSE}
+library(ggplot2)
+library(dplyr)
+library(lubridate)
+```
+## Celem analizy:
+
+Celem analizy jest zbadanie zależności pomiędzy natężeniem ruchu rowerowego a warunkami pogodowymi oraz identyfikacja wzorców sezonowych i lokalizacyjnych na podstawie danych z automatycznych punktów pomiarowych w Gdańsku.
+
+**Analiza ma na celu odpowiedzieć na pytania:**
+
+- Jak różni się liczba przejazdów rowerowych w zależności od lokalizacji stacji pomiarowej?
+
+- Czy istnieją istotne różnice w ruchu rowerowym w dni robocze i weekendy?
+
+- Jak warunki atmosferyczne, takie jak temperatura, opady czy wiatr, wpływają na liczbę przejazdów?
+
+- Które stacje odnotowują największe natężenie ruchu i czy zależności pogodowe są dla nich podobne?
+
+- **Wyniki analizy mogą być przydatne m.in. dla:**
+
+- Miasta Gdańsk – przy planowaniu i rozbudowie infrastruktury rowerowej,
+
+- Planistów transportu – do przewidywania natężenia ruchu w zależności od sezonu,
+
+- Mieszkańców i turystów – do świadomego planowania codziennej mobilności.
+
+
+
+# Podsumowanie danych
+
+```{r Ładowanie danych, echo=FALSE, message=FALSE, warning=FALSE}
+load("C:/Users/Jakub/Documents/Kuba/Studia/Studia magisterskie/Studia 10 semestr/Zaawansowane metody wizualizacji danych/przejazdy.RData")
+
+```
+
+```{r}
+summary(przejazdy)
+```
+
+```{r}
+dane <- przejazdy
+```
+
+# Wykresy
+
+## Porównanie stacji – rozkład przejazdów
+
+```{r}
+dane %>%
+  ggplot(aes(x = Stacja, y = Licznik)) +
+  geom_boxplot(fill = "lightblue") +
+  coord_flip() +
+  labs(title = "Rozkład liczby przejazdów w stacjach", y = "Liczba przejazdów")
+
+```
+
+
+## Liczba dni pomiarowych w poszczególnych stacjach
+```{r}
+
+dane %>%
+  group_by(Stacja) %>%
+  summarise(liczba_dni = n_distinct(Data)) %>%
+  ggplot(aes(x = reorder(Stacja, -liczba_dni), y = liczba_dni)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  coord_flip() +
+  labs(title = "Liczba dni pomiarowych w poszczególnych stacjach", x = "Stacja", y = "Liczba dni")
+
+```
+## Sezonowość – liczba przejazdów wg miesiąca
+```{r}
+dane <- dane %>%
+  mutate(Data = as.Date(Data),
+         Miesiac = month(Data, label = TRUE))
+
+dane %>%
+  ggplot(aes(x = Miesiac, y = Licznik)) +
+  geom_boxplot(fill = "orange") +
+  labs(title = "Sezonowość ruchu rowerowego", y = "Liczba przejazdów")
+
+```
+
+## Dni tygodnia – przejazdy w tygodniu vs. weekend
+```{r}
+dane <- dane %>%
+  mutate(DzienTygodnia = wday(Data, label = TRUE),
+         TypDnia = ifelse(DzienTygodnia %in% c("Sat", "Sun"), "Weekend", "Dzień powszedni"))
+
+dane %>%
+  ggplot(aes(x = TypDnia, y = Licznik, fill = TypDnia)) +
+  geom_boxplot() +
+  labs(title = "Przejazdy rowerowe: dni powszednie vs. weekendy", y = "Liczba przejazdów")
+
+```
+
+## Zależność od pogody – temperatura vs. liczba przejazdów
+
+```{r}
+dane %>%
+  ggplot(aes(x = Temperatura, y = Licznik)) +
+  geom_point(alpha = 0.4) +
+  geom_smooth(method = "lm", color = "red") +
+  labs(title = "Wpływ temperatury na liczbę przejazdów")
+
+```
+## Porównanie stacji – zależność liczba przejazdów vs. temperatura
+```{r}
+dane %>%
+  ggplot(aes(x = Temperatura, y = Licznik)) +
+  geom_point(alpha = 0.3) +
+  geom_smooth(method = "lm", se = FALSE, color = "blue") +
+  facet_wrap(~ Stacja) +
+  labs(title = "Zależność od temperatury w różnych stacjach")
+
+```
+
+## Heatmapa – średnia liczba przejazdów: miesiąc vs. dzień tygodnia
+```{r}
+dane %>%
+  mutate(Miesiac = month(Data, label = TRUE),
+         DzienTygodnia = wday(Data, label = TRUE)) %>%
+  group_by(Miesiac, DzienTygodnia) %>%
+  summarise(SredniaPrzejazdow = mean(Licznik, na.rm = TRUE)) %>%
+  ggplot(aes(x = Miesiac, y = DzienTygodnia, fill = SredniaPrzejazdow)) +
+  geom_tile() +
+  scale_fill_gradient(low = "white", high = "red") +
+  labs(title = "Średnia liczba przejazdów: miesiąc vs dzień tygodnia", fill = "Przejazdy")
+
+```
+
+## Rozkład liczby przejazdów dla stacji XXX
+```{r}
+wybrana_stacja <- "al. Grunwaldzka (Wrzeszcz)" # <- tutaj trzeba wpisać konkretną nazwę
+
+dane %>%
+  filter(Stacja == wybrana_stacja) %>%
+  ggplot(aes(x = Licznik)) +
+  geom_histogram(bins = 30, fill = "darkgreen", color = "white") +
+  labs(title = paste("Rozkład liczby przejazdów dla stacji", wybrana_stacja), x = "Liczba przejazdów", y = "Dni")
+
+```
+
+
+## Rozkład przejazdów wg miesiąca dla stacji XXX
+```{r}
+dane <- dane %>%
+  mutate(Data = as.Date(Data),
+         Miesiac = month(Data, label = TRUE),
+         DzienTygodnia = wday(Data, label = TRUE),
+         TypDnia = ifelse(DzienTygodnia %in% c("Sat", "Sun"), "Weekend", "Dzień powszedni"))
+
+dane %>%
+  filter(Stacja == wybrana_stacja) %>%
+  ggplot(aes(x = Miesiac, y = Licznik)) +
+  geom_boxplot(fill = "tomato") +
+  labs(title = paste("Ruch rowerowy wg miesiąca -", wybrana_stacja), y = "Liczba przejazdów")
+```
+
+## Porównanie stacji wg sezonowości / zależności czasowych
+
+NIECZYTELNE
+```{r}
+dane %>%
+  ggplot(aes(x = Miesiac, y = Licznik, fill = Stacja)) +
+  geom_boxplot() +
+  facet_wrap(~ Stacja) +
+  theme(axis.text.x = element_text(angle = 45)) +
+  labs(title = "Sezonowość ruchu rowerowego wg stacji")
+```
+
+## Zależność liczby przejazdów od temperatury w różnych stacjach
+```{r}
+dane %>%
+  ggplot(aes(x = Temperatura, y = Licznik)) +
+  geom_point(alpha = 0.3) +
+  geom_smooth(method = "lm", se = FALSE, color = "blue") +
+  facet_wrap(~ Stacja) +
+  labs(title = "Zależność liczby przejazdów od temperatury w różnych stacjach")
+```
+
+
+
+
