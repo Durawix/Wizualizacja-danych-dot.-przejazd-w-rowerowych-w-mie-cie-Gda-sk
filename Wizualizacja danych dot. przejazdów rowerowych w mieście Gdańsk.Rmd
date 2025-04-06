@@ -17,7 +17,6 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-
 # Wstęp
 
 ---
@@ -54,8 +53,6 @@ Celem analizy jest zbadanie zależności pomiędzy natężeniem ruchu rowerowego
 - Planistów transportu – do przewidywania natężenia ruchu w zależności od sezonu,
 
 - Mieszkańców i turystów – do świadomego planowania codziennej mobilności.
-
-
 
 # Podsumowanie danych
 
@@ -189,7 +186,7 @@ dane %>%
 
 ## Porównanie stacji wg sezonowości / zależności czasowych
 
-NIECZYTELNE
+NIECZYTELNE -> TO FIX albo poprawić albo usunąć
 ```{r}
 dane %>%
   ggplot(aes(x = Miesiac, y = Licznik, fill = Stacja)) +
@@ -200,7 +197,8 @@ dane %>%
 ```
 
 ## Zależność liczby przejazdów od temperatury w różnych stacjach
-```{r}
+
+```{r, message= FALSE, warning= FALSE}
 dane %>%
   ggplot(aes(x = Temperatura, y = Licznik)) +
   geom_point(alpha = 0.3) +
