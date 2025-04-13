@@ -165,7 +165,16 @@ dane %>%
   labs(title = "Sezonowość ruchu rowerowego", y = "Liczba przejazdów")
 ```
 
-Wykres przedstawia sezonowość ruchu rowerowego w Gdańsku w podziale na miesiące. Styczeń i luty mają najniższy ruch rowerowy, z medianą liczby przejazdów bliską 0 i maksymalnymi wartościami poniżej 1000. W tych miesiącach ruch jest minimalny, co prawdopodobnie wynika z niskich temperatur i trudnych warunków pogodowych. Marzec i kwiecień pokazują wzrost liczby przejazdów, z medianą w okolicach 200–300. Maksymalne wartości sięgają 3000–4000 przejazdów, co wskazuje na początki sezonu rowerowego. Maj, czerwiec, lipiec i sierpień to miesiące z największym natężeniem ruchu. Mediana liczby przejazdów wynosi około 1000–1500, a maksymalne wartości sięgają nawet 12000 przejazdów. Lipiec i sierpień mają najszerszy rozrzut danych, co może być związane z okresem wakacyjnym i większym ruchem turystycznym. Wrzesień i październik wciąż pokazują wysoki ruch, choć niższy niż w szczycie lata – mediana spada do około 500–700 przejazdów, a maksymalne wartości wynoszą około 6000. Listopad i grudzień charakteryzują się ponownym spadkiem ruchu, z medianą bliską 0 i maksymalnymi wartościami do 2000 przejazdów, co odzwierciedla koniec sezonu rowerowego.
+Wykres przedstawia sezonowość ruchu rowerowego w Gdańsku w podziale na miesiące. Styczeń i luty mają najniższy ruch rowerowy, z medianą liczby przejazdów bliską 0 i maksymalnymi wartościami poniżej 1000. 
+W tych miesiącach ruch jest minimalny, co prawdopodobnie wynika z niskich temperatur i trudnych warunków pogodowych. 
+
+Marzec i kwiecień pokazują wzrost liczby przejazdów, z medianą w okolicach 200–300. Maksymalne wartości sięgają 3000–4000 przejazdów, co wskazuje na początki sezonu rowerowego. 
+
+Maj, czerwiec, lipiec i sierpień to miesiące z największym natężeniem ruchu. Mediana liczby przejazdów wynosi około 1000–1500, a maksymalne wartości sięgają nawet 12000 przejazdów. 
+
+Lipiec i sierpień mają najszerszy rozrzut danych, co może być związane z okresem wakacyjnym i większym ruchem turystycznym. 
+
+Wrzesień i październik wciąż pokazują wysoki ruch, choć niższy niż w szczycie lata – mediana spada do około 500–700 przejazdów, a maksymalne wartości wynoszą około 6000. Listopad i grudzień charakteryzują się ponownym spadkiem ruchu, z medianą bliską 0 i maksymalnymi wartościami do 2000 przejazdów, co odzwierciedla koniec sezonu rowerowego.
 
 ## Dni tygodnia – przejazdy w tygodniu vs. weekend
 
