@@ -127,14 +127,17 @@ dane %>%
   expand_limits(y = max(dane$Licznik, na.rm = TRUE) * 1.05)
 ```
 
+Pas Nadmorski i al. Zwycięstwa mają największe natężenie ruchu rowerowego, z medianą liczby przejazdów przekraczającą 1000. 
+Rozpiętość danych jest duża, a maksymalne wartości sięgają około 12000 przejazdów, co wskazuje na dni o wyjątkowo wysokim ruchu. al. Grunwaldzka (Wrzeszcz), ul. Błędnik, ul. Chłopska, i al. Grunwaldzka (UG) również odnotowują wysoki ruch, z medianą w okolicach 500–1000 przejazdów. 
+Maksymalne wartości dla tych stacji sięgają 6000–9000 przejazdów. Stacje takie jak ul. Kartuska, ul. Kanał Raduni, al. Rzeczpospolitej, ul. Kołobrzeska, i ul. al. Hala mają mniejszy ruch, z medianą poniżej 500 przejazdów i maksymalnymi wartościami do około 3000–4000 przejazdów. 
 
+Najmniejszy ruch odnotowano na stacjach ul. Łostowicka, ul. Jaśkowa Dolina, ul. Nowolipie, ul. Kliniczna, ul. Wyzwolenia, ul. Rybnickiego, ul. Zwycięskiego, ul. Wita Stwosza, ul. Jana Pawł II, ul. Sucharskiego, ul. Elbląska, ul. Karczemki, i ul. Słowackiego (Matarnia), gdzie mediana jest bliska 0, a maksymalne wartości rzadko przekraczają 1000 przejazdów. 
 
-Pas Nadmorski i al. Zwycięstwa mają największe natężenie ruchu rowerowego, z medianą liczby przejazdów przekraczającą 1000. Rozpiętość danych jest duża, a maksymalne wartości sięgają około 12000 przejazdów, co wskazuje na dni o wyjątkowo wysokim ruchu. al. Grunwaldzka (Wrzeszcz), ul. Błędnik, ul. Chłopska, i al. Grunwaldzka (UG) również odnotowują wysoki ruch, z medianą w okolicach 500–1000 przejazdów. Maksymalne wartości dla tych stacji sięgają 6000–9000 przejazdów. Stacje takie jak ul. Kartuska, ul. Kanał Raduni, al. Rzeczpospolitej, ul. Kołobrzeska, i ul. al. Hala mają mniejszy ruch, z medianą poniżej 500 przejazdów i maksymalnymi wartościami do około 3000–4000 przejazdów. Najmniejszy ruch odnotowano na stacjach ul. Łostowicka, ul. Jaśkowa Dolina, ul. Nowolipie, ul. Kliniczna, ul. Wyzwolenia, ul. Rybnickiego, ul. Zwycięskiego, ul. Wita Stwosza, ul. Jana Pawł II, ul. Sucharskiego, ul. Elbląska, ul. Karczemki, i ul. Słowackiego (Matarnia), gdzie mediana jest bliska 0, a maksymalne wartości rzadko przekraczają 1000 przejazdów. Wartości odstające wskazują na dni z nietypowo wysokim ruchem, szczególnie widoczne dla stacji o większym natężeniu, takich jak Pas Nadmorski czy al. Zwycięstwa.
+Wartości odstające wskazują na dni z nietypowo wysokim ruchem, szczególnie widoczne dla stacji o większym natężeniu, takich jak Pas Nadmorski czy al. Zwycięstwa.
 
 ## Liczba dni pomiarowych w poszczególnych stacjach
 
 ```{r}
-
 dane %>%
   group_by(Stacja) %>%
   summarise(liczba_dni = n_distinct(Data)) %>%
@@ -147,8 +150,6 @@ dane %>%
        y = "Liczba dni") +
   theme_minimal() +
   expand_limits(y = max(dane$Data |> as.Date() |> n_distinct()) * 1.1)  # żeby etykiety się zmieściły
-
-
 ```
 
 ## Sezonowość – liczba przejazdów wg miesiąca
