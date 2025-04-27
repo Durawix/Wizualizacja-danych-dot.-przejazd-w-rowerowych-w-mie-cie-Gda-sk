@@ -21,7 +21,11 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ------------------------------------------------------------------------
 
-**Biblioteki wykorzystane do analizy** Do realizacji analizy wykorzystano następujące biblioteki w R: - **ggplot2** - **dplyr** - **lubridate**
+**Biblioteki wykorzystane do analizy** Do przeprowadzenia analizy wykorzystano następujące biblioteki w R: 
+
+- **ggplot2** 
+- **dplyr** 
+- **lubridate**
 
 ```{r, echo=FALSE, message= FALSE, warning= FALSE}
 library(ggplot2)
@@ -54,17 +58,28 @@ Celem analizy jest zbadanie zależności pomiędzy natężeniem ruchu rowerowego
 # Podsumowanie danych
 
 ```{r Ładowanie danych, echo=FALSE, message=FALSE, warning=FALSE}
-load("C:/Users/Patryk/Documents/Studia/Projekty/Wizualizacja_danych_przejazdy_rowerowe_Gdansk/przejazdy.RData")
+load("przejazdy.RData")
 
 ```
 
 ```{r}
 summary(przejazdy)
 ```
+## Suma przejazdów z podziałem na stację
+
+```{r}
+suma_per_stacja <- przejazdy %>%
+  group_by(Stacja) %>%
+  summarise(SumaPrzejazdow = sum(Licznik, na.rm = TRUE)) %>%
+  arrange(desc(SumaPrzejazdow))
+
+print(suma_per_stacja)
+
+```
 
 **Wstępna analiza kluczowych danych i zmiennych dla projektu:**
 
-1. Stacje i liczba przejazdów: Dane pochodzą z pięciu stacji: Wyciestwa (2739 przejazdów), Pas Nadmorski (2678), al. Grunwaldzka (Wrzeszcz) (2678), ul. 3 Maja (2647), ul. Wita Stwosza (2404) i al. Grunwaldzka (UG) (2313). Łącznie odnotowano 34 851 przejazdów. Najwięcej przejazdów zarejestrowano na stacji Wyciestwa, a najmniej na al. Grunwaldzka (UG). 
+1. Stacje i liczba przejazdów: 5 stacji które odnotowało najwięcej przejazdów: Zwyciestwa (2739 przejazdów), Pas Nadmorski (2678), al. Grunwaldzka (Wrzeszcz) (2678), ul. 3 Maja (2647), ul. Wita Stwosza (2404) i al. Grunwaldzka (UG) (2313). Łącznie odnotowano TOFIX przejazdów. Najwięcej przejazdów zarejestrowano na stacji Wyciestwa, a najmniej na al. Grunwaldzka (UG). 
 
 2. Czas trwania danych: Dane obejmują okres od 1 października 2013 roku do 31 marca 2021 roku, co daje szeroki zakres czasowy do analizy trendów sezonowych. 
 
@@ -88,30 +103,34 @@ dane <- przejazdy
 
 ## Porównanie stacji – rozkład przejazdów
 
-### TO FIX ZA MAŁO CZYTELNE -> CZY BIERZEMY ZAMIAST TEGO TOP 10? LUB ŚREDNIĄ LICZBE PRZEJAZDÓW??? -> TO CHYBA NIE JEST DOBRE
+# ZADANIE 1. Przedstawić rozkład liczby dni pomiarowych w poszczególnych punktach
+
 ```{r}
 dane %>%
-  ggplot(aes(x = Stacja, y = Licznik)) +
-  geom_boxplot(fill = "lightblue") +
-  coord_flip() +
-  labs(title = "Rozkład liczby przejazdów w stacjach", y = "Liczba przejazdów")
-```
-
-### TOP 10
-```{r}
-top_stacje <- dane %>%
   group_by(Stacja) %>%
-  summarise(SumaPrzejazdow = sum(Licznik, na.rm = TRUE)) %>%
-  top_n(10, SumaPrzejazdow) %>%
-  pull(Stacja)
-
-dane %>%
-  filter(Stacja %in% top_stacje) %>%
-  ggplot(aes(x = reorder(Stacja, Licznik, median), y = Licznik)) +
-  geom_boxplot(fill = "skyblue") +
+  summarise(LiczbaDni = n_distinct(Data)) %>%
+  arrange(desc(LiczbaDni)) %>%
+  ggplot(aes(x = reorder(Stacja, LiczbaDni), y = LiczbaDni)) +
+  geom_col(fill = "steelblue") +
+  geom_text(aes(label = LiczbaDni), hjust = -0.1, size = 3) +
   coord_flip() +
-  labs(title = "Rozkład przejazdów – top 10 stacji", x = "Stacja", y = "Liczba przejazdów")
+  labs(title = "Liczba dni pomiarowych w poszczególnych stacjach",
+       x = "Stacja", y = "Liczba dni") +
+  theme_minimal() +
+  expand_limits(y = max(dane$Data |> as.Date() |> n_distinct()) * 1.1)
 ```
+
+- **Najdłużej działające stacje** to Pas Nadmorski (2344 dni) i Al. Zwycięstwa (2619 dni), co koreluję z wnioskami z powyższego wykresu, że są to stacje o największym natężeniu ruchu (średnia liczba przejazdów: 1526 dla Pasu Nadmorskiego i 1550 dla Al. Zwycięstwa).
+
+- **Stacje o umiarkowanym ruchu**, takie jak ul. Kołobrzeska (1978 dni) czy ul. Jaśkowa Dolina (1913 dni), mają krótszy czas pomiarowy, co może wpływać na mniejszą liczbę przejazdów
+
+- **Stacje o niskim ruchu**, np. ul. Rybnickiego (1913 dni), ul. Wyzwolenia (1913 dni), ul. Wita Stwosza (1978 dni), również mają stosunkowo długi czas pomiarowy, ale liczba przejazdów jest niska (średnia 177–395), co może wskazywać na mniejszą popularność tych lokalizacji.
+
+- **Najkrócej działające stacje**, jak ul. Karczemki (892 dni) czy ul. Słowackiego (Matarnia) (982 dni), również znajdują się w grupie o niskim ruchu, co może sugerować, że krótszy czas zbierania danych wpływa na mniejsze wartości średnie przejazdów.
+
+**Wnioski**
+
+Wykres liczby dni pomiarowych dostarcza dodatkowego kontekstu do analizy ruchu rowerowego. Stacje o największym natężeniu ruchu (Pas Nadmorski, Al. Zwycięstwa) działały najdłużej, co może świadczyć o ich priorytetowym znaczeniu w systemie pomiarowym.
 
 ### ŚREDNIA LICZBA PRZEJAZDÓW NA STACJACH
 ```{r}
@@ -150,35 +169,86 @@ dane %>%
 
 Największe natężenie ruchu rowerowego odnotowują stacje Pas Nadmorski i al. Zwycięstwa, co może być związane z ich rekreacyjnym charakterem lub położeniem w głównych arteriach komunikacyjnych. Stacje o mniejszym ruchu, takie jak ul. Łostowicka czy ul. Kliniczna, mogą być mniej popularne ze względu na ograniczoną infrastrukturę rowerową lub charakter okolicy. Szczególną uwagę zwraca stacja Pas Nadmorski, która wyróżnia się wysokim ruchem, zwłaszcza w dni nietypowo wysokiej aktywności.
 
-## Liczba dni pomiarowych w poszczególnych stacjach
+# ZADANIE 2 Dla wybranego punktu przedstawić rozkład liczby przejazdów
+
+## Rozkład liczby przejazdów dla stacji al. Grunwaldzka (Wrzeszcz)
+
 ```{r}
+wybrana_stacja <- "al. Grunwaldzka (Wrzeszcz)" # <- Wybrana stacja
+
 dane %>%
-  group_by(Stacja) %>%
-  summarise(liczba_dni = n_distinct(Data)) %>%
-  ggplot(aes(x = reorder(Stacja, -liczba_dni), y = liczba_dni)) +
-  geom_bar(stat = "identity", fill = "steelblue") +
-  geom_text(aes(label = liczba_dni), hjust = -0.1, size = 3.5) +  # <- etykiety
-  coord_flip() +
-  labs(title = "Liczba dni pomiarowych w poszczególnych stacjach",
-       x = "Stacja",
-       y = "Liczba dni") +
-  theme_minimal() +
-  expand_limits(y = max(dane$Data |> as.Date() |> n_distinct()) * 1.1)  # żeby etykiety się zmieściły
+  filter(Stacja == wybrana_stacja) %>%
+  ggplot(aes(x = Licznik)) +
+  geom_histogram(bins = 30, fill = "darkgreen", color = "white") +
+  labs(title = paste("Rozkład liczby przejazdów dla stacji", wybrana_stacja), x = "Liczba przejazdów", y = "Dni")
+
 ```
 
-- **Najdłużej działające stacje** to Pas Nadmorski (2344 dni) i Al. Zwycięstwa (2619 dni), co koreluję z wnioskami z powyższego wykresu, że są to stacje o największym natężeniu ruchu (średnia liczba przejazdów: 1526 dla Pasu Nadmorskiego i 1550 dla Al. Zwycięstwa).
+- Większość dni na stacji al. Grunwaldzka (Wrzeszcz) charakteryzuje się niską liczbą przejazdów – najwięcej dni (około 200) miało od 0 do 500 przejazdów, co wskazuje na częste dni z małym ruchem.
+- Liczba dni maleje wraz ze wzrostem liczby przejazdów. Około 100 dni miało od 500 do 1000 przejazdów, a kolejne przedziały (1000–2000 przejazdów) obejmują coraz mniej dni.
+- Bardzo rzadko zdarzają się dni z liczbą przejazdów powyżej 3000 – histogram pokazuje pojedyncze dni z wartościami zbliżonymi do 4000 przejazdów.
+- Rozkład jest prawoskośny, z wyraźnym szczytem w przedziale 0–500 przejazdów i długim ogonem po prawej stronie, co sugeruje, że dni z wysokim ruchem są wyjątkiem.
 
-- **Stacje o umiarkowanym ruchu**, takie jak ul. Kołobrzeska (1978 dni) czy ul. Jaśkowa Dolina (1913 dni), mają krótszy czas pomiarowy, co może wpływać na mniejszą liczbę przejazdów
+**Wnioski:**
 
-- **Stacje o niskim ruchu**, np. ul. Rybnickiego (1913 dni), ul. Wyzwolenia (1913 dni), ul. Wita Stwosza (1978 dni), również mają stosunkowo długi czas pomiarowy, ale liczba przejazdów jest niska (średnia 177–395), co może wskazywać na mniejszą popularność tych lokalizacji.
+Histogram wskazuje, że na stacji al. Grunwaldzka (Wrzeszcz) ruch rowerowy jest zazwyczaj niski, z liczbą przejazdów najczęściej poniżej 500. Dni z większym natężeniem (powyżej 2000 przejazdów) są rzadkie, co może być związane z sezonowością lub specyfiką lokalizacji tej stacji.
 
-- **Najkrócej działające stacje**, jak ul. Karczemki (892 dni) czy ul. Słowackiego (Matarnia) (982 dni), również znajdują się w grupie o niskim ruchu, co może sugerować, że krótszy czas zbierania danych wpływa na mniejsze wartości średnie przejazdów.
+# ZADANIE 3 Porównać punkty pod względem natężenia /rozkładu przejazdów
 
-**Wnioski**
+```{r}
+przejazdy %>%
+  group_by(Stacja) %>%
+  summarise(SumaPrzejazdow = sum(Licznik, na.rm = TRUE)) %>%
+  arrange(desc(SumaPrzejazdow)) %>%
+  ggplot(aes(x = reorder(Stacja, SumaPrzejazdow), y = SumaPrzejazdow)) +
+  geom_col(fill = "darkorange") +
+  geom_text(aes(label = SumaPrzejazdow), hjust = -0.1, size = 3) +
+  coord_flip() +
+  labs(title = "Suma przejazdów rowerowych w poszczególnych stacjach",
+       x = "Stacja", y = "Suma przejazdów") +
+  theme_minimal() +
+  expand_limits(y = max(przejazdy$Licznik, na.rm = TRUE) * 1.1)
+```
 
-Wykres liczby dni pomiarowych dostarcza dodatkowego kontekstu do analizy ruchu rowerowego. Stacje o największym natężeniu ruchu (Pas Nadmorski, Al. Zwycięstwa) działały najdłużej, co może świadczyć o ich priorytetowym znaczeniu w systemie pomiarowym.
+# TO FIX DODAC WNIOSKI
 
-## Sezonowość – liczba przejazdów wg miesiąca
+
+#  ZADANIE 4 Przedstawić natężenie / rozkład przejazdów dla wybranej stacji w zależności od miesiąca / dnia tygodnia / dni powszednich/weekendowych
+
+```{r}
+# PRZYGOTOWANIE DANYCH
+
+# Wybierz nazwę stacji
+wybrana_stacja <- "al. Grunwaldzka (Wrzeszcz)" # <- Wybrana stacja
+
+# Dodaj kolumny pomocnicze
+przejazdy_stacja <- przejazdy %>%
+  filter(Stacja == wybrana_stacja) %>%
+  mutate(
+    Data = as.Date(Data),
+    Miesiac = month(Data, label = TRUE),
+    DzienTygodnia = wday(Data, label = TRUE),
+    TypDnia = ifelse(DzienTygodnia %in% c("Sat", "Sun"), "Weekend", "Dzień powszedni")
+  )
+```
+
+
+
+```{r}
+ggplot(przejazdy_stacja, aes(x = Miesiac, y = Licznik)) +
+  geom_boxplot(fill = "tomato") +
+  labs(title = paste("Rozkład przejazdów wg miesiąca –", wybrana_stacja),
+       x = "Miesiąc", y = "Liczba przejazdów") +
+  theme_minimal()
+```
+
+
+# TO FIX DODAC WNIOSKI
+
+# ZADANIE 5 Porównać stacje pod względem zależności z poprzedniego punktu
+
+## Ogólna Sezonowość – liczba przejazdów wg miesiąca
+
 ```{r}
 dane <- dane %>%
   mutate(Data = as.Date(Data),
@@ -190,6 +260,34 @@ dane %>%
   labs(title = "Sezonowość ruchu rowerowego", y = "Liczba przejazdów")
 ```
 
+
+## Top 6 stacji Sezonowość – liczba przejazdów wg miesiąca
+
+```{r}
+# Tworzymy dane z kolumną "Miesiac"
+dane <- dane %>%
+  mutate(Data = as.Date(Data),
+         Miesiac = month(Data, label = TRUE))
+
+# Wybieramy top 6 stacji o największej sumie przejazdów
+top_stacje <- dane %>%
+  group_by(Stacja) %>%
+  summarise(Suma = sum(Licznik, na.rm = TRUE)) %>%
+  slice_max(Suma, n = 6) %>%
+  pull(Stacja)
+
+# Wykres rozkładu miesięcznego tylko dla top 6 stacji
+dane %>%
+  filter(Stacja %in% top_stacje) %>%
+  ggplot(aes(x = Miesiac, y = Licznik)) +
+  geom_boxplot(fill = "orange") +
+  facet_wrap(~ Stacja, ncol = 3) +
+  labs(title = "Sezonowość ruchu rowerowego – top 6 stacji",
+       x = "Miesiąc", y = "Liczba przejazdów") +
+  theme_minimal()
+```
+
+TO FIX WNIOSKI!
 
 - Marzec i kwiecień pokazują wzrost liczby przejazdów, z medianą w okolicach 200–300. Maksymalne wartości sięgają 3000–4000 przejazdów, co wskazuje na początki sezonu rowerowego. 
 
@@ -203,36 +301,24 @@ dane %>%
 
 Ruch rowerowy w Gdańsku jest silnie sezonowy – największe natężenie występuje w miesiącach letnich (maj–sierpień), co pokrywa się z wysoką aktywnością na stacjach takich jak Pas Nadmorski i Al. Zwycięstwa. Zima i późna jesień to okresy minimalnego ruchu, szczególnie na mniej popularnych stacjach (np. ul. Karczemki).
 
-## Dni tygodnia – przejazdy w tygodniu vs. weekend
-```{r}
-dane <- dane %>%
-  mutate(DzienTygodnia = wday(Data, label = TRUE),
-         TypDnia = ifelse(DzienTygodnia %in% c("Sat", "Sun"), "Weekend", "Dzień powszedni"))
+# ZADANIE 6 Dla wybranej stacji przedstawić zależność między liczbą przejazdów a wybranymi warunkami pogodowymi
+
+## Wpływ temperatury na liczbę przejazdów na stacji al. Grunwaldzka (Wrzeszcz)
+
+```{r message=FALSE, warning=FALSE}
+wybrana_stacja <- "al. Grunwaldzka (Wrzeszcz)"
 
 dane %>%
-  ggplot(aes(x = TypDnia, y = Licznik, fill = TypDnia)) +
-  geom_boxplot() +
-  labs(title = "Przejazdy rowerowe: dni powszednie vs. weekendy", y = "Liczba przejazdów")
+  filter(Stacja == wybrana_stacja) %>%
+  ggplot(aes(x = Temperatura, y = Licznik)) +
+  geom_point(alpha = 0.3, color = "darkblue") +
+  geom_smooth(method = "lm", se = FALSE, color = "red") +
+  labs(title = paste("Zależność liczby przejazdów od temperatury –", wybrana_stacja),
+       x = "Temperatura (°C)", y = "Liczba przejazdów") +
+  theme_minimal()
 ```
 
-- **Najbardziej ruchliwe stacje:**  
-   - Pas Nadmorski: Średnia liczba przejazdów wynosi 2526, a mediana przekracza 1000. To stacja o największym natężeniu ruchu.  
-   - al. Zwycięstwa: Średnia to 1550 przejazdów, mediana również przekracza 1000.  
-   - al. Grunwaldzka (Wrzeszcz), ul. Błędnik, ul. Chłopska, al. Grunwaldzka (UG): Średnie wartości wynoszą odpowiednio 1420, 1106, 1131 i 1240 przejazdów, z medianą w granicach 500–1000. Maksymalne wartości dla tych stacji sięgają 6000–9000 przejazdów.
-
-- **Stacje o umiarkowanym ruchu:**  
-   - al. Rzeczpospolitej, ul. Kołobrzeska: Średnie liczby przejazdów to odpowiednio 566 i 546. Mediana wynosi około 300–500 przejazdów, a maksymalne wartości osiągają 3000–4000 przejazdów.  
-   - ul. Łostowicka, ul. Jaśkowa Dolina, ul. Nowolipie, ul. Kliniczna: Średnie wynoszą 519, 457, 426 i 417 przejazdów, z podobnym zakresem mediany.
-
-- **Stacje o niskim ruchu:**  
-   - ul. Rybnickiego, ul. Wyzwolenia, ul. Zwycięskiego, ul. Stryjewskiego, ul. Wita Stwosza, ul. Jana Pawła II, ul. Sucharskiego, ul. Elbląska, ul. Karczemki, ul. Słowackiego (Matarnia): Średnie liczby przejazdów mieszczą się w przedziale 177–395. Mediana jest bliska 0, a maksymalne wartości rzadko przekraczają 1000 przejazdów.
-
-**Wnioski:**  
-   - Najwyższe natężenie ruchu rowerowego odnotowują stacje Pas Nadmorski i al. Zwycięstwa, co może być związane z ich rekreacyjnym charakterem lub położeniem w głównych arteriach komunikacyjnych.  
-   - Stacje o mniejszym ruchu, takie jak ul. Łostowicka czy ul. Kliniczna, mogą być mniej popularne ze względu na ograniczoną infrastrukturę rowerową lub charakter okolicy.  
-   - Szczególną uwagę zwraca stacja Pas Nadmorski, która wyróżnia się wysokim ruchem, zwłaszcza w dni nietypowo wysokiej aktywności.
-
-## Wpływ temperatury na liczbę przejazdów
+## Ogólne - Wpływ temperatury na liczbę przejazdów
 
 ```{r message=FALSE, warning=FALSE}
 dane %>%
@@ -252,6 +338,35 @@ dane %>%
 **Wnioski:** 
 
 Wykres wskazuje, że temperatura ma istotny wpływ na ruch rowerowy w Gdańsku. Największe natężenie występuje w temperaturach między 10°C a 20°C, co odpowiada wiosennym i letnim warunkom. Niskie temperatury (poniżej 0°C) znacząco ograniczają ruch, co jest zgodne z oczekiwaniami dotyczącymi wpływu pogody na aktywność rowerową.
+
+## Wpływ wilgotności na liczbę przejazdów na stacji al. Grunwaldzka (Wrzeszcz)
+
+```{r message=FALSE, warning=FALSE}
+wybrana_stacja <- "al. Grunwaldzka (Wrzeszcz)"
+
+dane %>%
+  filter(Stacja == wybrana_stacja) %>%
+  ggplot(aes(x = Wilgotność, y = Licznik)) +
+  geom_point(alpha = 0.3, color = "darkblue") +
+  geom_smooth(method = "lm", se = FALSE, color = "red") +
+  labs(title = paste("Zależność liczby przejazdów od wilgotności –", wybrana_stacja),
+       x = "Średnia dobowa wilgotność względna (%)", y = "Liczba przejazdów") +
+  theme_minimal()
+```
+TO FIX WNIOSKI
+
+## Ogólne - Wpływ wilgotności na liczbę przejazdów
+
+```{r message=FALSE, warning=FALSE}
+dane %>%
+  ggplot(aes(x = Wilgotność, y = Licznik)) +
+  geom_point(alpha = 0.4) +
+  geom_smooth(method = "lm", color = "red") +
+  labs(title = "Wpływ wilgotności na liczbę przejazdów")
+```
+TO FIX WNIOSKI
+
+# ZADANIE 7 Porównać stacje pod względem zależności z poprzedniego punktu
 
 ## Zależność liczba przejazdów vs. temperatura z podziałem na stacje
 ### Funkcja dzieląca wykresy
@@ -278,14 +393,13 @@ for (i in seq_along(grupy_stacji)) {
   print(wykres)
 }
 ```
-???????????? za dużo wykresów o chuj chodzi
+
 Wykres przedstawia zależność między temperaturą a liczbą przejazdów rowerowych w różnych stacjach pomiarowych w Gdańsku.
 
 Pas Nadmorski i al. Zwycięstwa wykazują największy ruch rowerowy, z liczbą przejazdów sięgającą 12 000 przy temperaturach 10–20°C. Linia trendu pokazuje wyraźny wzrost liczby przejazdów wraz z temperaturą, szczególnie powyżej 0°C. al. Grunwaldzka (Wrzeszcz), ul. 3 Maja, ul. Błędnik, i al. Hallera również pokazują wzrost liczby przejazdów przy wyższych temperaturach, osiągając maksymalnie 6000–8000 przejazdów w zakresie 10–20°C. Wzrost jest mniej stromy niż w Pasie Nadmorskim. ul. Chłopska, al. Grunwaldzka (UG), ul. Kartuska, ul. Kanał Raduni, al. Rzeczpospolitej, i ul. Kołobrzeska mają mniejszy ruch, z maksymalnymi wartościami do 4000 przejazdów. Wzrost liczby przejazdów jest widoczny, ale mniej wyraźny, szczególnie przy temperaturach poniżej 0°C, gdzie ruch jest minimalny. Stacje takie jak ul. Hala, ul. Łostowicka, ul. Jaśkowa Dolina, ul. Nowolipie, ul. Kliniczna, ul. Wyzwolenia, ul. Rybnickiego, ul. Zwycięskiego, ul. Stryjewskiego, ul. Wita Stwosza, ul. Jana Pawła II, ul. Sucharskiego, ul. Elbląska, ul. Karczemki, i ul. Słowackiego (Matarnia) odnotowują bardzo niski ruch, z maksymalnymi wartościami rzadko przekraczającymi 2000 przejazdów, nawet przy wysokich temperaturach. Linie trendu są niemal płaskie, co wskazuje na słaby wpływ temperatury na ruch w tych lokalizacjach.
 
+# Dodatkowy wykres
 ## Heatmap – średnia liczba przejazdów: miesiąc vs. dzień tygodnia
-
-
 
 ```{r message=FALSE, warning=FALSE}
 dane %>%
@@ -308,80 +422,3 @@ dane %>%
 
 Heatmapa pokazuje wyraźną sezonowość ruchu rowerowego, z największym natężeniem w miesiącach letnich, szczególnie w środku tygodnia. Zimą ruch jest minimalny, a różnice między dniami tygodnia stają się mniej widoczne. Wiosną i jesienią ruch jest umiarkowany, z lekką przewagą dni roboczych.
 
-## Rozkład liczby przejazdów dla stacji al. Grunwaldzka (Wrzeszcz)
-
-```{r}
-wybrana_stacja <- "al. Grunwaldzka (Wrzeszcz)" # <- Wybrana stacja
-
-dane %>%
-  filter(Stacja == wybrana_stacja) %>%
-  ggplot(aes(x = Licznik)) +
-  geom_histogram(bins = 30, fill = "darkgreen", color = "white") +
-  labs(title = paste("Rozkład liczby przejazdów dla stacji", wybrana_stacja), x = "Liczba przejazdów", y = "Dni")
-
-```
-
-- Większość dni na stacji al. Grunwaldzka (Wrzeszcz) charakteryzuje się niską liczbą przejazdów – najwięcej dni (około 200) miało od 0 do 500 przejazdów, co wskazuje na częste dni z małym ruchem.
-- Liczba dni maleje wraz ze wzrostem liczby przejazdów. Około 100 dni miało od 500 do 1000 przejazdów, a kolejne przedziały (1000–2000 przejazdów) obejmują coraz mniej dni.
-- Bardzo rzadko zdarzają się dni z liczbą przejazdów powyżej 3000 – histogram pokazuje pojedyncze dni z wartościami zbliżonymi do 4000 przejazdów.
-- Rozkład jest prawoskośny, z wyraźnym szczytem w przedziale 0–500 przejazdów i długim ogonem po prawej stronie, co sugeruje, że dni z wysokim ruchem są wyjątkiem.
-
-**Wnioski:**
-
-Histogram wskazuje, że na stacji al. Grunwaldzka (Wrzeszcz) ruch rowerowy jest zazwyczaj niski, z liczbą przejazdów najczęściej poniżej 500. Dni z większym natężeniem (powyżej 2000 przejazdów) są rzadkie, co może być związane z sezonowością lub specyfiką lokalizacji tej stacji.
-
-## Rozkład przejazdów wg miesiąca dla stacji XXX
-
-```{r}
-dane <- dane %>%
-  mutate(Data = as.Date(Data),
-         Miesiac = month(Data, label = TRUE),
-         DzienTygodnia = wday(Data, label = TRUE),
-         TypDnia = ifelse(DzienTygodnia %in% c("Sat", "Sun"), "Weekend", "Dzień powszedni"))
-
-dane %>%
-  filter(Stacja == wybrana_stacja) %>%
-  ggplot(aes(x = Miesiac, y = Licznik)) +
-  geom_boxplot(fill = "tomato") +
-  labs(title = paste("Ruch rowerowy wg miesiąca -", wybrana_stacja), y = "Liczba przejazdów")
-```
-
-- **Styczeń i luty:** Ruch rowerowy jest bardzo niski, z medianą liczby przejazdów bliską 0. Maksymalne wartości osiągają około 500–1000 przejazdów, co wskazuje na minimalną aktywność w tych miesiącach.
-- **Marzec i kwiecień:** Liczba przejazdów zaczyna rosnąć, z medianą w okolicach 500. Maksymalne wartości sięgają 2000–3000 przejazdów, co odzwierciedla początek sezonu rowerowego.
-- **Maj, czerwiec, lipiec i sierpień:** To szczyt sezonu rowerowego na tej stacji. Mediana liczby przejazdów wynosi około 1000–1500, a maksymalne wartości sięgają 4000 przejazdów, szczególnie w czerwcu i lipcu. Rozrzut danych jest największy w tych miesiącach.
-- **Wrzesień i październik:** Ruch nadal jest wysoki, z medianą około 1000 przejazdów, ale maksymalne wartości spadają do 3000 przejazdów, co wskazuje na stopniowe zmniejszanie się aktywności.
-- **Listopad i grudzień:** Ruch rowerowy spada, z medianą zbliżoną do 0–500 przejazdów. Maksymalne wartości nie przekraczają 2000 przejazdów.
-
-
-**Wnioski:**
-
-Wykres pokazuje wyraźną sezonowość ruchu rowerowego na stacji al. Grunwaldzka (Wrzeszcz), z największym natężeniem w miesiącach letnich (czerwiec–sierpień), gdzie liczba przejazdów jest najwyższa. Zimą (styczeń–luty) ruch jest minimalny, co jest zgodne z ogólnymi trendami w danych. Wartości odstające w miesiącach letnich wskazują na dni o wyjątkowo wysokim ruchu, prawdopodobnie związane z pogodą lub wydarzeniami w mieście.
-
-## Porównanie stacji wg sezonowości / zależności czasowych
-### Funkcja
-
-NIECZYTELNE -> TO FIX albo poprawić albo usunąć
-
-```{r}
-library(dplyr)
-library(ggplot2)
-
-# Lista stacji podzielona po 2
-stacje <- unique(dane$Stacja)
-grupy_stacji <- split(stacje, ceiling(seq_along(stacje) / 2))
-
-# Pętla po grupach – każdy wykres osobno (w RMarkdown będą się ładnie wyświetlać pod sobą)
-for (i in seq_along(grupy_stacji)) {
-  dane %>%
-    filter(Stacja %in% grupy_stacji[[i]]) %>%
-    ggplot(aes(x = Miesiac, y = Licznik, fill = Stacja)) +
-    geom_boxplot() +
-    facet_wrap(~ Stacja, ncol = 3) +
-    theme_minimal() +
-    theme(axis.text.x = element_text(angle = 45)) +
-    labs(title = paste("Sezonowość ruchu – grupa", i),
-         y = "Liczba przejazdów", x = "Miesiąc") -> wykres
-  
-  print(wykres)
-}
-```
