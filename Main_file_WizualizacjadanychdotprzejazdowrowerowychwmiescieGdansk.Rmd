@@ -103,7 +103,8 @@ dane <- przejazdy
 
 ## Porównanie stacji – rozkład przejazdów
 
-# ZADANIE 1. Przedstawić rozkład liczby dni pomiarowych w poszczególnych punktach
+
+**Zadanie 1. Przedstawić rozkład liczby dni pomiarowych w poszczególnych punktach**
 
 ```{r}
 dane %>%
@@ -132,7 +133,7 @@ dane %>%
 
 Wykres liczby dni pomiarowych dostarcza dodatkowego kontekstu do analizy ruchu rowerowego. Stacje o największym natężeniu ruchu (Pas Nadmorski, Al. Zwycięstwa) działały najdłużej, co może świadczyć o ich priorytetowym znaczeniu w systemie pomiarowym.
 
-### ŚREDNIA LICZBA PRZEJAZDÓW NA STACJACH
+### Średnia liczba przejazdów na stacjach
 ```{r}
 dane %>%
   group_by(Stacja) %>%
@@ -169,7 +170,7 @@ dane %>%
 
 Największe natężenie ruchu rowerowego odnotowują stacje Pas Nadmorski i al. Zwycięstwa, co może być związane z ich rekreacyjnym charakterem lub położeniem w głównych arteriach komunikacyjnych. Stacje o mniejszym ruchu, takie jak ul. Łostowicka czy ul. Kliniczna, mogą być mniej popularne ze względu na ograniczoną infrastrukturę rowerową lub charakter okolicy. Szczególną uwagę zwraca stacja Pas Nadmorski, która wyróżnia się wysokim ruchem, zwłaszcza w dni nietypowo wysokiej aktywności.
 
-# ZADANIE 2 Dla wybranego punktu przedstawić rozkład liczby przejazdów
+**Zadanie 2. Dla wybranego punktu przedstawić rozkład liczby przejazdów**
 
 ## Rozkład liczby przejazdów dla stacji al. Grunwaldzka (Wrzeszcz)
 
@@ -193,7 +194,9 @@ dane %>%
 
 Histogram wskazuje, że na stacji al. Grunwaldzka (Wrzeszcz) ruch rowerowy jest zazwyczaj niski, z liczbą przejazdów najczęściej poniżej 500. Dni z większym natężeniem (powyżej 2000 przejazdów) są rzadkie, co może być związane z sezonowością lub specyfiką lokalizacji tej stacji.
 
-# ZADANIE 3 Porównać punkty pod względem natężenia /rozkładu przejazdów
+**Zadanie 3. Porównać punkty pod względem natężenia/rozkładu przejazdów**
+
+# TO FIX UCINA LICZBE I SUMA PRZEJAZDÓW W TYŚDAJ, ja nie mg bo nie mam uprawnien xd d xdxd 
 
 ```{r}
 przejazdy %>%
@@ -210,10 +213,20 @@ przejazdy %>%
   expand_limits(y = max(przejazdy$Licznik, na.rm = TRUE) * 1.1)
 ```
 
-# TO FIX DODAC WNIOSKI
+**Wnioski:**
 
+- Dominacja Pasu Nadmorskiego: Stacja Pas Nadmorski wyróżnia się zdecydowanie największą sumą przejazdów, co wskazuje na jej wyjątkową popularność w porównaniu do innych lokalizacji.
 
-#  ZADANIE 4 Przedstawić natężenie / rozkład przejazdów dla wybranej stacji w zależności od miesiąca / dnia tygodnia / dni powszednich/weekendowych
+- Wysokie natężenie na Al. Zwycięstwa i Al. Grunwaldzkiej: Al. Zwycięstwa oraz trzy lokalizacje Al. Grunwaldzkiej również osiągają bardzo wysokie sumy przejazdów, sugerując, że są to kluczowe obszary dla ruchu rowerowego.
+
+- Średni poziom aktywności: Stacje takie jak ul. Kołobrzeska, Jaśkowa Dolina i Kliniczna mają umiarkowane sumy przejazdów, co może wskazywać na stabilny, ale mniej intensywny ruch w tych lokalizacjach.
+
+- Niski ruch na peryferiach: Stacje takie jak ul. Rybnickiego, Wita Stwosza, Karczemki i Słowackiego (Matarnia)
+charakteryzują się najniższymi sumami przejazdów, co sugeruje mniejsze zainteresowanie tymi obszarami przez rowerzystów.
+
+- Zróżnicowanie ruchu: Wykres wyraźnie dzieli stacje na trzy grupy pod względem natężenia, co podkreśla nierównomierne rozłożenie aktywności rowerowej w mieście.
+
+**Zadanie 4** Przedstawić natężenie / rozkład przejazdów dla wybranej stacji w zależności od miesiąca / dnia tygodnia / dni powszednich/weekendowych
 
 ```{r}
 # PRZYGOTOWANIE DANYCH
@@ -242,8 +255,17 @@ ggplot(przejazdy_stacja, aes(x = Miesiac, y = Licznik)) +
   theme_minimal()
 ```
 
+**Wnioski**
 
-# TO FIX DODAC WNIOSKI
+- Największe natężenie przejazdów występuje w miesiącach letnich, szczególnie od maja do sierpnia, co sugeruje silny wpływ pogody i sezonu turystycznego lub rekreacyjnego na aktywność rowerową.
+
+- Styczeń, luty, listopad i grudzień charakteryzują się znacząco mniejszą liczbą przejazdów, co wskazuje na ograniczenia związane z zimowymi warunkami pogodowymi.
+
+- Miesiące takie jak maj, czerwiec i lipiec osiągają najwyższe wartości, co może wskazywać na okres największej popularności tej lokalizacji wśród rowerzystów.
+
+- Wiosna (marzec, kwiecień) i jesień (wrzesień, październik) pokazują umiarkowany ruch, co sugeruje stopniowe zwiększanie lub zmniejszanie aktywności w zależności od zmieniających się warunków atmosferycznych.
+
+- Wykres wyraźnie pokazuje nierównomierny rozkład przejazdów w ciągu roku, z wyraźnym wyróżnieniem okresów wysokiego i niskiego natężenia, co podkreśla sezonowy charakter użytkowania stacji.
 
 # ZADANIE 5 Porównać stacje pod względem zależności z poprzedniego punktu
 
@@ -260,6 +282,13 @@ dane %>%
   labs(title = "Sezonowość ruchu rowerowego", y = "Liczba przejazdów")
 ```
 
+**Wnioski**
+
+- Największe natężenie przejazdów występuje w miesiącach letnich, szczególnie od maja do sierpnia, co sugeruje silny wpływ korzystnych warunków pogodowych i prawdopodobnie sezonu turystycznego lub rekreacyjnego na aktywność rowerową.
+- Styczeń, luty, listopad i grudzień odznaczają się znacznie niższą liczbą przejazdów, co wskazuje na ograniczenia wynikające z zimowych warunków atmosferycznych, takich jak niskie temperatury czy opady.
+- Miesiące takie jak maj, czerwiec i lipiec osiągają najwyższe wartości, co może świadczyć o ich roli jako szczytowego okresu popularności wśród rowerzystów.
+- Wiosna (marzec, kwiecień) i jesień (wrzesień, październik) pokazują umiarkowany ruch, co sugeruje stopniowe zwiększanie aktywności wiosną i jej stopniowe zmniejszanie jesienią w zależności od pogody.
+- Wykres ujawnia wyraźny sezonowy wzorzec, z wyraźnym podziałem na okresy wysokiego i niskiego natężenia przejazdów, co podkreśla cykliczny charakter korzystania z rowerów w ciągu roku.
 
 ## Top 6 stacji Sezonowość – liczba przejazdów wg miesiąca
 
@@ -287,19 +316,18 @@ dane %>%
   theme_minimal()
 ```
 
-TO FIX WNIOSKI!
-
-- Marzec i kwiecień pokazują wzrost liczby przejazdów, z medianą w okolicach 200–300. Maksymalne wartości sięgają 3000–4000 przejazdów, co wskazuje na początki sezonu rowerowego. 
-
-- Maj, czerwiec, lipiec i sierpień to miesiące z największym natężeniem ruchu. Mediana liczby przejazdów wynosi około 1000–1500, a maksymalne wartości sięgają nawet 12000 przejazdów. 
-
-- Lipiec i sierpień mają najszerszy rozrzut danych, co może być związane z okresem wakacyjnym i większym ruchem turystycznym. 
-
-- Wrzesień i październik wciąż pokazują wysoki ruch, choć niższy niż w szczycie lata – mediana spada do około 500–700 przejazdów, a maksymalne wartości wynoszą około 6000. Listopad i grudzień charakteryzują się ponownym spadkiem ruchu, z medianą bliską 0 i maksymalnymi wartościami do 2000 przejazdów, co odzwierciedla koniec sezonu rowerowego.
 
 **Wnioski**
 
-Ruch rowerowy w Gdańsku jest silnie sezonowy – największe natężenie występuje w miesiącach letnich (maj–sierpień), co pokrywa się z wysoką aktywnością na stacjach takich jak Pas Nadmorski i Al. Zwycięstwa. Zima i późna jesień to okresy minimalnego ruchu, szczególnie na mniej popularnych stacjach (np. ul. Karczemki).
+- Największe natężenie przejazdów występuje na stacji Pas Nadmorski, szczególnie w miesiącach letnich od maja do sierpnia, co sugeruje silny wpływ sezonu turystycznego lub rekreacyjnego na ruch rowerowy w tej lokalizacji.
+
+- Stacja Al. Zwycięstwa (w 3 Maja) również wykazuje wysokie wartości przejazdów w okresie letnim, wskazując na jej popularność, choć nieco mniejszą w porównaniu do Pasu Nadmorskiego.
+
+- Stacje Al. Grunwaldzka (Wrzeszcz), Błędnik i Al. Grunwaldzka (UG) pokazują umiarkowany ruch, z wyraźnym szczytem w miesiącach letnich, co podkreśla sezonowy charakter tych lokalizacji.
+
+- Wszystkie sześć stacji odnotowuje znacząco niższą liczbę przejazdów w miesiącach zimowych, takich jak styczeń, luty, listopad i grudzień, co wskazuje na ograniczenia wynikające z niekorzystnych warunków pogodowych.
+
+- Wykres ujawnia wspólny wzorzec sezonowości wśród topowych stacji, z wyraźnym wzrostem aktywności wiosną i latem, a następnie jej spadkiem jesienią i zimą, co podkreśla zależność od pory roku.
 
 # ZADANIE 6 Dla wybranej stacji przedstawić zależność między liczbą przejazdów a wybranymi warunkami pogodowymi
 
@@ -317,6 +345,18 @@ dane %>%
        x = "Temperatura (°C)", y = "Liczba przejazdów") +
   theme_minimal()
 ```
+
+**Wnioski**
+
+- Liczba przejazdów wzrasta wraz ze wzrostem temperatury, co sugeruje silny pozytywny wpływ warunków pogodowych na aktywność rowerową na tej stacji.
+
+- Przy niższych temperaturach (poniżej 0°C) liczba przejazdów jest znacznie mniejsza, co wskazuje na ograniczenia związane z zimową aurą.
+
+- Najwyższe wartości przejazdów występują w zakresie temperatur od 10°C do 20°C, co może wskazywać na optymalne warunki dla rowerzystów.
+
+- Linia trendu potwierdza wyraźną zależność między temperaturą a liczbą przejazdów, sugerując, że wyższe temperatury sprzyjają większej frekwencji na stacji Al. Grunwaldzka (Wrzeszcz).
+
+- Rozproszenie punktów wokół linii trendu wskazuje na pewne wahania, co może być związane z innymi czynnikami, takimi jak wilgotność czy dni robocze/weekendy, ale ogólny trend pozostaje pozytywny.
 
 ## Ogólne - Wpływ temperatury na liczbę przejazdów
 
@@ -353,7 +393,19 @@ dane %>%
        x = "Średnia dobowa wilgotność względna (%)", y = "Liczba przejazdów") +
   theme_minimal()
 ```
-TO FIX WNIOSKI
+
+
+**Wnioski**
+
+- Liczba przejazdów maleje wraz ze wzrostem wilgotności, co sugeruje negatywny wpływ wysokiej wilgotności na aktywność rowerową na tej stacji.
+
+- Przy wilgotności powyżej 80% liczba przejazdów jest zauważalnie niższa, co może wskazywać na niechęć rowerzystów do jazdy w warunkach wysokiej wilgotności, często związanej z opadami.
+
+- Najwyższe wartości przejazdów występują przy wilgotności poniżej 60%, co sugeruje, że bardziej suche warunki sprzyjają większej frekwencji.
+
+- Linia trendu potwierdza wyraźną ujemną korelację między wilgotnością a liczbą przejazdów, wskazując, że wilgotność jest istotnym czynnikiem wpływającym na ruch rowerowy.
+
+- Rozproszenie punktów wokół linii trendu wskazuje na pewne wyjątki, co może być związane z innymi czynnikami, takimi jak temperatura czy dzień tygodnia, ale ogólny trend pozostaje ujemny.
 
 ## Ogólne - Wpływ wilgotności na liczbę przejazdów
 
@@ -364,7 +416,21 @@ dane %>%
   geom_smooth(method = "lm", color = "red") +
   labs(title = "Wpływ wilgotności na liczbę przejazdów")
 ```
-TO FIX WNIOSKI
+
+- Przy bardzo niskich wartościach wilgotności (bliskich 0%) liczba przejazdów jest bardzomiała, zazwyczaj poniżej 1000, co może wskazywać na rzadkie korzystanie z rowerów w takich warunkach.
+
+- Wraz ze wzrostem wilgotności do średniego zakresu (około 40–60%) obserwuje się wzrost liczby przejazdów, osiągając wartości od 1000 do 4000, co sugeruje umiarkowane natężenie ruchu w tych warunkach.
+
+- Przy temperaturach wilgotności powyżej 80% liczba przejazdów spada znacząco, zazwyczaj poniżej 2000, co może wskazywać na niechęć rowerzystów do jazdy w warunkach wysokiej wilgotności.
+
+- Punktem 20% wilgotności jest najwyższa wartość liczby przejazdów, osiągając nawet 10 000 przejazdów, co sugeruje optymalne warunki dla aktywności rowerowej.
+
+- Linia trendu  pokazuje wyraźny ujemny trend w zależności od wilgotności, co potwierdza korelację między wilgotnością a liczbą przejazdów.
+
+
+**Wnioski**
+
+Wykres wskazuje, że wilgotność ma istotny wpływ na ruch rowerowy, z wyraźnym spadkiem liczby przejazdów przy wysokich wartościach wilgotności (powyżej 80%). Optymalne warunki dla jazdy rowerem wydają się występować przy wilgotności poniżej 20%, co odpowiada wysokim wartościom natężenia ruchu. Niższe wartości wilgotności są związane z lepszymi warunkami pogodowymi, podczas gdy wysoka wilgotność (powyżej 80%) może zniechęcać rowerzystów do aktywności.
 
 # ZADANIE 7 Porównać stacje pod względem zależności z poprzedniego punktu
 
@@ -394,9 +460,19 @@ for (i in seq_along(grupy_stacji)) {
 }
 ```
 
-Wykres przedstawia zależność między temperaturą a liczbą przejazdów rowerowych w różnych stacjach pomiarowych w Gdańsku.
+Wykresy przedstawiają zależność między temperaturą a liczbą przejazdów rowerowych w różnych stacjach pomiarowych w Gdańsku.
 
-Pas Nadmorski i al. Zwycięstwa wykazują największy ruch rowerowy, z liczbą przejazdów sięgającą 12 000 przy temperaturach 10–20°C. Linia trendu pokazuje wyraźny wzrost liczby przejazdów wraz z temperaturą, szczególnie powyżej 0°C. al. Grunwaldzka (Wrzeszcz), ul. 3 Maja, ul. Błędnik, i al. Hallera również pokazują wzrost liczby przejazdów przy wyższych temperaturach, osiągając maksymalnie 6000–8000 przejazdów w zakresie 10–20°C. Wzrost jest mniej stromy niż w Pasie Nadmorskim. ul. Chłopska, al. Grunwaldzka (UG), ul. Kartuska, ul. Kanał Raduni, al. Rzeczpospolitej, i ul. Kołobrzeska mają mniejszy ruch, z maksymalnymi wartościami do 4000 przejazdów. Wzrost liczby przejazdów jest widoczny, ale mniej wyraźny, szczególnie przy temperaturach poniżej 0°C, gdzie ruch jest minimalny. Stacje takie jak ul. Hala, ul. Łostowicka, ul. Jaśkowa Dolina, ul. Nowolipie, ul. Kliniczna, ul. Wyzwolenia, ul. Rybnickiego, ul. Zwycięskiego, ul. Stryjewskiego, ul. Wita Stwosza, ul. Jana Pawła II, ul. Sucharskiego, ul. Elbląska, ul. Karczemki, i ul. Słowackiego (Matarnia) odnotowują bardzo niski ruch, z maksymalnymi wartościami rzadko przekraczającymi 2000 przejazdów, nawet przy wysokich temperaturach. Linie trendu są niemal płaskie, co wskazuje na słaby wpływ temperatury na ruch w tych lokalizacjach.
+**Wnioski**
+
+
+
+- Pas Nadmorski i al. Zwycięstwa wykazują największy ruch rowerowy, z liczbą przejazdów sięgającą 12 000 przy temperaturach 10–20°C. Linia trendu pokazuje wyraźny wzrost liczby przejazdów wraz z temperaturą, szczególnie powyżej 0°C. 
+
+- al. Grunwaldzka (Wrzeszcz), ul. 3 Maja, ul. Błędnik, i al. Hallera również pokazują wzrost liczby przejazdów przy wyższych temperaturach, osiągając maksymalnie 6000–8000 przejazdów w zakresie 10–20°C. 
+
+- Wzrost jest mniej stromy niż w Pasie Nadmorskim. ul. Chłopska, al. Grunwaldzka (UG), ul. Kartuska, ul. Kanał Raduni, al. Rzeczpospolitej, i ul. Kołobrzeska mają mniejszy ruch, z maksymalnymi wartościami do 4000 przejazdów. Wzrost liczby przejazdów jest widoczny, ale mniej wyraźny, szczególnie przy temperaturach poniżej 0°C, gdzie ruch jest minimalny. 
+
+- Stacje takie jak ul. Hala, ul. Łostowicka, ul. Jaśkowa Dolina, ul. Nowolipie, ul. Kliniczna, ul. Wyzwolenia, ul. Rybnickiego, ul. Zwycięskiego, ul. Stryjewskiego, ul. Wita Stwosza, ul. Jana Pawła II, ul. Sucharskiego, ul. Elbląska, ul. Karczemki, i ul. Słowackiego (Matarnia) odnotowują bardzo niski ruch, z maksymalnymi wartościami rzadko przekraczającymi 2000 przejazdów, nawet przy wysokich temperaturach. Linie trendu są niemal płaskie, co wskazuje na słaby wpływ temperatury na ruch w tych lokalizacjach.
 
 # Dodatkowy wykres
 ## Heatmap – średnia liczba przejazdów: miesiąc vs. dzień tygodnia
