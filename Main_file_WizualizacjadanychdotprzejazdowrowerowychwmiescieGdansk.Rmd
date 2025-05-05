@@ -73,13 +73,14 @@ suma_per_stacja <- przejazdy %>%
   summarise(SumaPrzejazdow = sum(Licznik, na.rm = TRUE)) %>%
   arrange(desc(SumaPrzejazdow))
 
-print(suma_per_stacja)
+suma_per_stacja
 
 ```
 
 **Wstępna analiza kluczowych danych i zmiennych dla projektu:**
 
-1. Stacje i liczba przejazdów: 5 stacji które odnotowało najwięcej przejazdów: Zwyciestwa (2739 przejazdów), Pas Nadmorski (2678), al. Grunwaldzka (Wrzeszcz) (2678), ul. 3 Maja (2647), ul. Wita Stwosza (2404) i al. Grunwaldzka (UG) (2313). Łącznie odnotowano TOFIX przejazdów. Najwięcej przejazdów zarejestrowano na stacji Wyciestwa, a najmniej na al. Grunwaldzka (UG). 
+1. Najbardziej ruchliwe stacje (>5mln) to "Pas nadmorski" oraz "al. Zwycięstwa", stacje o wysokiej liczbie przejazdów (1,5-5mln) to "ul. 3 Maja", "al. Grundwaldzka (Wrzeszcz)", "al. Grunwaldzka (UG)", "Błędnik", "al. Hallera", "ul. Kartuska", "ul. Chłopska", "Kanał Raduni". Pozostaje stacje to stacje o umiarkowanej liczbie przejazdów (<1mln)
+
 
 2. Czas trwania danych: Dane obejmują okres od 1 października 2013 roku do 31 marca 2021 roku, co daje szeroki zakres czasowy do analizy trendów sezonowych. 
 
@@ -196,21 +197,21 @@ Histogram wskazuje, że na stacji al. Grunwaldzka (Wrzeszcz) ruch rowerowy jest 
 
 **Zadanie 3. Porównać punkty pod względem natężenia/rozkładu przejazdów**
 
-# TO FIX UCINA LICZBE I SUMA PRZEJAZDÓW W TYŚDAJ, ja nie mg bo nie mam uprawnien xd d xdxd 
 
 ```{r}
 przejazdy %>%
   group_by(Stacja) %>%
   summarise(SumaPrzejazdow = sum(Licznik, na.rm = TRUE)) %>%
   arrange(desc(SumaPrzejazdow)) %>%
-  ggplot(aes(x = reorder(Stacja, SumaPrzejazdow), y = SumaPrzejazdow)) +
+  ggplot(aes(x = reorder(Stacja, SumaPrzejazdow), y = SumaPrzejazdow / 1000)) +  
   geom_col(fill = "darkorange") +
-  geom_text(aes(label = SumaPrzejazdow), hjust = -0.1, size = 3) +
+  geom_text(aes(label = sprintf("%.0fK", SumaPrzejazdow / 1000)), hjust = -0.1, size = 3) +  
   coord_flip() +
   labs(title = "Suma przejazdów rowerowych w poszczególnych stacjach",
-       x = "Stacja", y = "Suma przejazdów") +
+       x = "Stacja", y = "Suma przejazdów (w tysiącach)") +
   theme_minimal() +
-  expand_limits(y = max(przejazdy$Licznik, na.rm = TRUE) * 1.1)
+  scale_y_continuous(expand = expansion(mult = c(0, 0.1))) + 
+  theme(axis.text.y = element_text(size = 8, hjust = 1, angle = 0))  
 ```
 
 **Wnioski:**
@@ -231,10 +232,8 @@ charakteryzują się najniższymi sumami przejazdów, co sugeruje mniejsze zaint
 ```{r}
 # PRZYGOTOWANIE DANYCH
 
-# Wybierz nazwę stacji
 wybrana_stacja <- "al. Grunwaldzka (Wrzeszcz)" # <- Wybrana stacja
 
-# Dodaj kolumny pomocnicze
 przejazdy_stacja <- przejazdy %>%
   filter(Stacja == wybrana_stacja) %>%
   mutate(
